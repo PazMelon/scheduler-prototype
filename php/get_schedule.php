@@ -34,24 +34,40 @@ $whereClauses = [];
 $params = [];
 
 /* Filter by program (department) */
-$dept = $_GET['program'] ?? null;
-if ($dept) {
-    $whereClauses[] = "t.department = :department";
-    $params[':department'] = $dept;
+if (!empty($_GET['program'])) {
+    $whereClauses[] = 't.department = :department';
+    $params[':department'] = $_GET['program'];
 }
 
 /* Filter by teachers */
+/* ---------- 5.  Extract teacher filter (if any) ----------
+   -------------------------------------------------------- */
 $teacherIds = [];
 if (!empty($_GET['teachers'])) {
-    // explode, cast to int, remove empty values
-    $teacherIds = array_filter(array_map('intval', explode(',', $_GET['teachers'])));
-}
-if ($teacherIds) {
-    // build ? placeholders
-    $placeholders = implode(',', array_fill(0, count($teacherIds), '?'));
-    $whereClauses[] = "s.teacher_id IN ($placeholders)";
-    foreach ($teacherIds as $id) {
-        $params[] = $id;            // positional parameters after the named ones
+    $parts = explode(',', $_GET['teachers']);
+
+    /* special “no teachers selected” flag */
+    if ($parts === ['-1']) {          // <- we sent this from the front‑end
+        $whereClauses[] = '1=0';      // always false → empty result set
+    } else {
+        foreach ($parts as $p) {
+            $id = intval($p);
+            if ($id > 0) {
+                $teacherIds[] = $id;
+            }
+        }
+
+        if (!empty($teacherIds)) {
+            /* create a named placeholder for every ID */
+            $placeholders = [];
+            foreach ($teacherIds as $idx => $id) {
+                $ph = ":tid$idx";
+                $placeholders[] = $ph;
+                $params[$ph] = $id; // bind the value
+            }
+            $whereClauses[] =
+                's.teacher_id IN (' . implode(',', $placeholders) . ')';
+        }
     }
 }
 
@@ -79,7 +95,7 @@ $deptColors = [
     'BAP' => '#d6d615ff'
 ];
 
-/* ---------- 5.  Build FullCalendar events ----------
+/* ---------- 6.  Build FullCalendar events ----------
    -------------------------------------------------------- */
 $events = [];
 foreach ($rows as $row) {
