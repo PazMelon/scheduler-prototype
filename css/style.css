@@ -14,6 +14,7 @@
     border-radius: .5rem;
     padding: 1rem;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+    height: 700px;
 }
 
 /* optional: make the filter and calendar share the same horizontal padding */
@@ -25,7 +26,7 @@
 
 
 .teacher-list {
-    max-height: 400px;
+    max-height: 550px;
     overflow-y: auto;
 }
 
