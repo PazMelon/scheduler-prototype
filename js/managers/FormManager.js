@@ -120,7 +120,7 @@ export const FormManager = (() => {
             $.post('php/update_schedule.php', pendingRequest.data, function (resp) {
                 if (resp.success) {
                     ModalManager.hide('conflictRoomModal');
-                    calendar.refetchEvents();
+                    CalendarManager.refetch();
                 } else if (Array.isArray(resp.available_rooms)) {
                     alert('Still conflict after selecting room. Please try another.');
                 } else {
@@ -129,7 +129,7 @@ export const FormManager = (() => {
             }, 'json');
         } else {                                            // create / edit form
             sendFormRequest();                              // this will hide the class modal
-           ModalManager.hide('conflictRoomModal');
+            ModalManager.hide('conflictRoomModal');
         }
     });
 
