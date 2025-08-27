@@ -21,7 +21,7 @@ export const CalendarManager = (() => {
         timeZone: 'UTC',
         events: 'php/get_schedule.php',
         dayHeaderFormat: { weekday: 'long' },
-        height: 'auto',
+        height: '700px',
         select: FormManager.openCreateModal,
         eventClick: e => FormManager.openEditModal(e.event),
         eventDrop: e => FormManager.handleEventChange(e, 'drop'),
