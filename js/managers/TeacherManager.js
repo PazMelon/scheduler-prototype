@@ -3,12 +3,15 @@ export const TeacherManager = (() => {
     const $conflictTeacherSel = $('#conflictTeacherSelect');
 
     /** Load teachers (optionally filtered by department) */
-    function loadTeachers(filter = '') {
+    function loadTeachers(filter = '', cb) {
         const url = filter
             ? `php/get_teachers.php?department=${encodeURIComponent(filter)}`
             : 'php/get_teachers.php';
 
-        $.getJSON(url, populate);
+        $.getJSON(url, data => {
+            populate(data);
+            if (cb) cb();          // ← call the callback once teachers are rendered
+        });
     }
 
     /**
