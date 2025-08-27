@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Class Scheduler</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FullCalendar v6 -->
+    <script src="js/fullcalendar.js"></script>
+
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container-fluid py-4">
+        <h1 class="text-center mb-4">Class Scheduler (Week View)</h1>
+
+        <div class="row">
+        <!-- Sidebar: Teacher Filter -->
+            <div class="col-md-2 mb-4">
+                <div class="teacher-filter">
+
+                    <!-- Department Dropdown -->
+                    <div class="mb-3 mt-4">
+                        <select id="program" class="form-select">
+                            <option value="" selected>All Department</option>
+                            <option value="ITP">Information Technology Program</option>
+                            <option value="TEP">Teacher Education Program</option>
+                            <option value="CJP">Criminal Justice Program</option>
+                            <option value="HMP">Hospital Management Program</option>
+                            <option value="BAP">Business Administration Program</option>
+                        </select>
+                    </div>
+
+                    <!-- Teacher Checkboxes -->
+                    <div class="teacher-list">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="teacher1">
+                            <label class="form-check-label" for="teacher1">Alice Johnson</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="2" id="teacher2">
+                            <label class="form-check-label" for="teacher2">Bob Smith</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="3" id="teacher3">
+                            <label class="form-check-label" for="teacher3">Carol Lee</label>
+                 </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="4" id="teacher4">
+                            <label class="form-check-label" for="teacher4">David Martinez</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="5" id="teacher5">
+                            <label class="form-check-label" for="teacher5">Emily Chen</label>
+                        </div>
+                        <!-- More dummy teachers -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="6" id="teacher6">
+                            <label class="form-check-label" for="teacher6">Frank Wilson</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="7" id="teacher7">
+                            <label class="form-check-label" for="teacher7">Grace Kim</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar -->
+            <div class="col-md-10">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class / Edit Modal -->
+    <div class="modal fade" id="classModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered justify-content-center">
+            <form id="classForm">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Schedule Class</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="id">
+                        <input type="hidden" name="start">
+                        <input type="hidden" name="end">
+                        <input type="hidden" name="day">
+
+                        <div class="row mb-3">
+                            <label for="className" class="col-sm-2 col-form-label">Class Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="className" name="class_name" class="form-control"
+                                    placeholder="e.g. ITP 302 – Database Administrator" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="roomSelect" class="col-sm-2 col-form-label">Room</label>
+                            <div class="col-sm-10">
+                                <select id="roomSelect" name="room_id" class="form-select" required></select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="teacherSelect" class="col-sm-2 col-form-label">Teacher</label>
+                            <div class="col-sm-10">
+                                <select id="teacherSelect" name="teacher_id" class="form-select" required></select>
+                            </div>
+                        </div>
+
+
+                        <hr>
+
+                        <p><strong>Day:</strong> <span id="modalDay"></span></p>
+                        <p><strong>Start Time:</strong> <span id="modalStartTime"></span></p>
+                        <p><strong>End Time:</strong> <span id="modalEndTime"></span></p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <!-- Delete button – only visible when editing an event -->
+                        <button type="button" id="deleteBtn" class="btn btn-danger me-2 d-none">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Room Conflict Modal -->
+    <div class="modal fade" id="conflictRoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Scheduling Conflict</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>That time slot is already taken in the chosen room.</p>
+                    <ul id="conflictList" class="mb-2"></ul>
+                    <p>Please pick an available room:</p>
+                    <select id="conflictRoomSelect" class="form-select"></select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="conflictOkBtn" class="btn btn-danger">Use Selected Room</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conflict Modal -->
+    <div class="modal fade" id="conflictTeacherModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Double Booked Conflict</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>The teacher is already scheduled at that time.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="conflictTeacherOkBtn" class="btn btn-danger"
+                        data-bs-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------
+     Delete‑Confirmation Modal (same style as other modals)
+   --------------------------------------------------- -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Delete Class</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this class?</p>
+                </div>
+                <div class="modal-footer">
+                    <!-- “Delete” button – triggers the AJAX call -->
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+                    <!-- Cancel button – just closes the modal -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <!-- <script src="js/calendar.js"></script> Old Script Entry Monolithic Style -->
+     <script type="module" src="js/app.js"></script>
+
+</body>
+
+</html>
