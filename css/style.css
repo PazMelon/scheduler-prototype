@@ -6,7 +6,7 @@
     border-radius: .5rem;
     padding: 1rem;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-    margin:auto;
+    margin: auto;
 }
 
 .teacher-filter {
@@ -16,9 +16,17 @@
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
 }
 
+/* optional: make the filter and calendar share the same horizontal padding */
+.row>.col-md-2,
+.row>.col-md-10 {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+
 .teacher-list {
-    max-height : 400px;
-    overflow-y : auto;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 /* Hide the date numbers – only weekday names are shown */
